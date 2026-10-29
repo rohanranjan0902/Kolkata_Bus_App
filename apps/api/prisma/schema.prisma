@@ -1,0 +1,104 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  role      String   @default("DRIVER")
+  phone     String?  @unique
+  email     String?  @unique
+  password  String
+  name      String
+  driver    Driver?
+  createdAt DateTime @default(now())
+}
+
+model Driver {
+  id            String  @id @default(uuid())
+  userId        String  @unique
+  user          User    @relation(fields: [userId], references: [id])
+  licenseNumber String  @unique
+  status        String  @default("OFFLINE")
+  assignedBusId String? @unique
+  bus           Bus?    @relation("AssignedDriver", fields: [assignedBusId], references: [id])
+  trips         Trip[]
+}
+
+model Bus {
+  id                 String    @id @default(uuid())
+  registrationNumber String    @unique
+  displayName        String
+  capacity           Int
+  operator           String
+  status             String    @default("OFFLINE")
+  currentDriver      Driver?   @relation("AssignedDriver")
+  trips              Trip[]
+}
+
+model Route {
+  id          String   @id @default(uuid())
+  origin      String
+  destination String
+  polyline    String
+  stops       Stop[]
+  trips       Trip[]
+}
+
+model Stop {
+  id        String @id @default(uuid())
+  routeId   String
+  route     Route  @relation(fields: [routeId], references: [id])
+  name      String
+  latitude  Float
+  longitude Float
+  sequence  Int
+}
+
+model Trip {
+  id             String         @id @default(uuid())
+  busId          String
+  bus            Bus            @relation(fields: [busId], references: [id])
+  driverId       String
+  driver         Driver         @relation(fields: [driverId], references: [id])
+  routeId        String
+  route          Route          @relation(fields: [routeId], references: [id])
+  status         String         @default("SCHEDULED")
+  scheduledStart DateTime
+  actualStart    DateTime?
+  actualEnd      DateTime?
+  locations      LiveLocation[]
+  bookings       Booking[]
+}
+
+model LiveLocation {
+  id        String   @id @default(uuid())
+  tripId    String
+  trip      Trip     @relation(fields: [tripId], references: [id])
+  latitude  Float
+  longitude Float
+  speed     Float
+  heading   Float
+  timestamp DateTime
+}
+
+model Booking {
+  id         String @id @default(uuid())
+  tripId     String
+  trip       Trip   @relation(fields: [tripId], references: [id])
+  guestName  String
+  guestPhone String
+  seatId     String
+  seat       Seat   @relation(fields: [seatId], references: [id])
+}
+
+model Seat {
+  id       String    @id @default(uuid())
+  busId    String
+  number   String
+  bookings Booking[]
+}
