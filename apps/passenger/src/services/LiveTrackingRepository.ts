@@ -1,13 +1,6 @@
 import { LiveBusLocation, ActiveTrip } from '../models/driverTypes';
 import { io, Socket } from 'socket.io-client';
-import { Platform } from 'react-native';
-
-const getBaseUrl = () => {
-  if (Platform.OS === 'android') {
-    return 'http://10.0.2.2:3000';
-  }
-  return 'http://localhost:3000';
-};
+import { getBaseUrl } from './api';
 
 type LocationSubscriber = (loc: LiveBusLocation) => void;
 

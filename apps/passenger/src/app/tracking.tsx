@@ -88,7 +88,7 @@ export default function TrackingScreen() {
           </View>
           <View style={styles.headerRight}>
             <Text style={styles.busNoLabel}>BUS NO.</Text>
-            <Text style={styles.busNoValue}>{bus?.registrationNumber || busId}</Text>
+            <Text style={styles.busNoValue}>{bus?.number || bus?.registrationNumber || busId}</Text>
           </View>
         </View>
 

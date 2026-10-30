@@ -1,11 +1,15 @@
 import axios from 'axios';
 import { Platform } from 'react-native';
+import Constants from 'expo-constants';
 
-// For Android Emulator, localhost points to the emulator itself.
-// 10.0.2.2 points to the host machine's localhost.
-// For iOS simulator, localhost works fine.
-// Replace with your actual local IP (e.g., 192.168.x.x) if testing on a physical device.
-const getBaseUrl = () => {
+export const getBaseUrl = () => {
+  if (process.env.EXPO_PUBLIC_API_URL) {
+    return process.env.EXPO_PUBLIC_API_URL;
+  }
+  const host = Constants.expoConfig?.hostUri?.split(':')[0];
+  if (host && host !== 'localhost') {
+    return `http://${host}:3000`;
+  }
   if (Platform.OS === 'android') {
     return 'http://10.0.2.2:3000';
   }
@@ -18,5 +22,3 @@ export const api = axios.create({
     'Content-Type': 'application/json',
   },
 });
-
-// We can add interceptors here later for adding JWT tokens from SecureStore

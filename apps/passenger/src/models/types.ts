@@ -1,6 +1,7 @@
 export interface Bus {
   id: string;
   number: string; // e.g., 'WB-01-2210'
+  registrationNumber?: string;
   routeId: string; // eg . '42A' / '39A' etc 
   type: string;
   isAC: boolean;

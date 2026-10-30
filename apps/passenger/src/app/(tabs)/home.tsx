@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Text, TouchableOpacity, Dimensions } from 'react-native';
 import MapView, { Marker, PROVIDER_DEFAULT } from 'react-native-maps';
 import io, { Socket } from 'socket.io-client';
-import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';
+import { getBaseUrl } from '../../services/api';
 
 const { width, height } = Dimensions.get('window');
 
@@ -34,8 +34,7 @@ export default function Home() {
   const [buses, setBuses] = useState<{ [id: string]: { lat: number; lng: number, routeNumber?: string, busStops?: string } }>({});
 
   useEffect(() => {
-    const host = Constants.expoConfig?.hostUri?.split(':')[0] || 'localhost';
-    const socket: Socket = io(`http://${host}:3000`);
+    const socket: Socket = io(getBaseUrl());
     
     socket.on('connect', () => {
       socket.emit('room.join', { room: 'admin:fleet' });

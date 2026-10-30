@@ -1,5 +1,5 @@
 import { Stack } from 'expo-router';
-import '../locationTask'; // Import to register the background task
+import '../../locationTask'; // Import to register the background task
 
 export default function AppLayout() {
   return (

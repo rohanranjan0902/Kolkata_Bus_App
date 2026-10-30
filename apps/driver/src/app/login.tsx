@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import { useRouter } from 'expo-router';
+import { getBaseUrl } from '../services/api';
 
 export default function DriverLogin() {
   const [emailOrPhone, setEmailOrPhone] = useState('');
@@ -10,8 +11,7 @@ export default function DriverLogin() {
 
   const handleLogin = async () => {
     try {
-      // Use EXPO_PUBLIC_API_URL or hardcode for local dev in simulator
-      const apiUrl = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
+      const apiUrl = getBaseUrl();
       const res = await fetch(`${apiUrl}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
