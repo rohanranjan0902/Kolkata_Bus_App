@@ -7,19 +7,33 @@ export class RedisIoAdapter extends IoAdapter {
   private adapterConstructor?: ReturnType<typeof createAdapter>;
 
   async connectToRedis(): Promise<void> {
-    try {
-      const pubClient = createClient({ url: process.env.REDIS_URL || 'redis://localhost:6380' });
-      const subClient = pubClient.duplicate();
+    const redisUrl = process.env.REDIS_URL;
+    if (!redisUrl) {
+      console.log('No REDIS_URL provided. Using default in-memory WebSocket adapter.');
+      return;
+    }
 
-      // Suppress unhandled error events if redis is offline
-      pubClient.on('error', (err) => console.warn('Redis pub error:', err.message));
-      subClient.on('error', (err) => console.warn('Redis sub error:', err.message));
+    let pubClient;
+    let subClient;
+    try {
+      pubClient = createClient({
+        url: redisUrl,
+        socket: {
+          reconnectStrategy: (retries) => (retries >= 3 ? false : Math.min(retries * 1000, 3000)),
+        },
+      });
+      subClient = pubClient.duplicate();
+
+      pubClient.on('error', (err) => console.warn('Redis pub warning:', err.message));
+      subClient.on('error', (err) => console.warn('Redis sub warning:', err.message));
 
       await Promise.all([pubClient.connect(), subClient.connect()]);
       this.adapterConstructor = createAdapter(pubClient, subClient);
       console.log('Successfully connected to Redis WebSocket adapter');
     } catch (err: any) {
       console.warn('Could not connect to Redis, falling back to default in-memory adapter:', err?.message || err);
+      try { pubClient?.disconnect(); } catch {}
+      try { subClient?.disconnect(); } catch {}
     }
   }
 
