@@ -10,5 +10,8 @@
     "dev": "npm run dev --workspaces --if-present",
     "build": "npx prisma generate --schema apps/api/prisma/schema.prisma && npm run build --workspaces --if-present",
     "test": "npm run test --workspaces --if-present"
+  },
+  "prisma": {
+    "seed": "node apps/api/dist/prisma/seed.js"
   }
 }
